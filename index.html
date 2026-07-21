@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sound & Form | Wireless Headphones</title>
+  <style>
+    :root {
+      --ink: #151515;
+      --muted: #66645f;
+      --line: #d8d7d2;
+      --gallery: #f0f1f1;
+      --warm: #f7f6f2;
+      --warning: #a51d27;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button { font: inherit; }
+
+    .site-header {
+      height: 72px;
+      padding: 0 clamp(20px, 4vw, 64px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-bottom: 1px solid #e3e2de;
+    }
+
+    .brandmark {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: .18em;
+      white-space: nowrap;
+    }
+
+    .breadcrumb {
+      width: min(1320px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 18px 0 14px;
+      color: #797771;
+      font-size: 11px;
+    }
+
+    .product-page {
+      width: min(1320px, calc(100% - 48px));
+      margin: 0 auto 64px;
+      display: grid;
+      grid-template-columns: minmax(430px, 1.12fr) minmax(380px, .88fr);
+      gap: clamp(42px, 6vw, 92px);
+      align-items: start;
+    }
+
+    .gallery-column {
+      min-width: 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .image-stage {
+      width: min(100%, 560px);
+      aspect-ratio: 1122 / 1402;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: var(--gallery);
+    }
+
+    #productImage {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 130ms ease;
+    }
+
+    #productImage.is-visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .details {
+      max-width: 520px;
+      padding-top: 6px;
+    }
+
+    .category {
+      margin: 0 0 13px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(34px, 3.2vw, 48px);
+      font-weight: 400;
+      line-height: 1.08;
+    }
+
+    .description {
+      max-width: 440px;
+      margin: 15px 0 18px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .rule {
+      height: 1px;
+      margin: 25px 0 23px;
+      background: var(--line);
+    }
+
+    .option-heading {
+      margin-bottom: 10px;
+      display: flex;
+    }
+
+    .option-heading strong {
+      font-size: 12px;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+
+    .product-dropdown {
+      position: relative;
+      width: 100%;
+      min-height: 372px;
+    }
+
+    .dropdown-trigger {
+      width: 100%;
+      height: 42px;
+      padding: 0 42px 0 12px;
+      position: relative;
+      color: #393834;
+      background: #fff;
+      border: 1px solid #aaa8a1;
+      font-size: 12px;
+      text-align: left;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .dropdown-trigger::after {
+      content: '';
+      width: 7px;
+      height: 7px;
+      position: absolute;
+      top: 15px;
+      right: 16px;
+      border-right: 1px solid #333;
+      border-bottom: 1px solid #333;
+      transform: rotate(45deg);
+      transition: transform 120ms ease;
+    }
+
+    .product-dropdown.is-open .dropdown-trigger::after {
+      top: 18px;
+      transform: rotate(225deg);
+    }
+
+    .dropdown-trigger:hover,
+    .dropdown-trigger:focus-visible { border-color: #55534e; }
+
+    .dropdown-trigger.is-selected {
+      padding: 0 40px 0 10px;
+      color: #111;
+      border: 3px solid #111;
+      font-weight: 700;
+    }
+
+    .dropdown-menu {
+      display: none;
+      width: 100%;
+      max-height: 324px;
+      margin: 4px 0 0;
+      padding: 4px;
+      position: absolute;
+      z-index: 10;
+      overflow-y: auto;
+      list-style: none;
+      background: #fff;
+      border: 1px solid #aaa8a1;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, .09);
+    }
+
+    .product-dropdown.is-open .dropdown-menu { display: block; }
+
+    .dropdown-menu li { margin: 0; }
+
+    .dropdown-menu .product-option {
+      border-color: transparent;
+    }
+
+    .product-option {
+      width: 100%;
+      min-height: 36px;
+      padding: 7px 12px;
+      color: #393834;
+      background: #fff;
+      border: 1px solid transparent;
+      font-size: 12px;
+      text-align: left;
+      cursor: pointer;
+      outline: none;
+      transition: background 100ms ease, border-color 100ms ease;
+    }
+
+    .product-option:hover,
+    .product-option:focus-visible {
+      background: var(--warm);
+      border-color: #55534e;
+    }
+
+    .product-option.is-selected {
+      padding: 6px 10px;
+      color: #111;
+      background: #fff;
+      border: 2px solid #111;
+      font-weight: 700;
+    }
+
+    .decision-message {
+      min-height: 40px;
+      padding-top: 10px;
+      color: var(--warning);
+      font-size: 12px;
+      line-height: 1.4;
+      visibility: hidden;
+    }
+
+    .decision-message.is-visible { visibility: visible; }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .action-button {
+      width: 100%;
+      height: 50px;
+      color: #fff;
+      background: #171717;
+      border: 1px solid #171717;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .action-button:hover,
+    .action-button:focus-visible {
+      background: #393939;
+      border-color: #393939;
+      outline: none;
+    }
+
+    @media (max-width: 880px) {
+      .product-page {
+        grid-template-columns: 1fr;
+        gap: 36px;
+      }
+      .gallery-column { order: 1; }
+      .details { order: 2; max-width: none; }
+      .image-stage { width: min(100%, 520px); }
+    }
+
+    @media (max-width: 520px) {
+      .site-header { height: 62px; }
+      .breadcrumb, .product-page { width: calc(100% - 28px); }
+      .breadcrumb { padding-top: 14px; }
+      .product-page { margin-bottom: 36px; }
+      .image-stage { width: 100%; }
+      .button-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brandmark">SOUND &amp; FORM</div>
+  </header>
+
+  <div class="breadcrumb">Home / Headphones / Wireless over-ear</div>
+
+  <main class="product-page">
+    <section class="gallery-column" aria-label="Product image gallery">
+      <div class="image-stage">
+        <img id="productImage" src="" alt="" decoding="async">
+      </div>
+    </section>
+
+    <section class="details">
+      <p class="category">Wireless audio</p>
+      <h1>Everyday Over-Ear Headphones</h1>
+      <p class="description">Comfortable wireless listening for work, travel, and everything in between. Product details are available for each option below.</p>
+      <div class="rule"></div>
+
+      <div class="option-heading">
+        <strong id="productLabel">All available products</strong>
+      </div>
+      <div class="product-dropdown" id="productDropdown">
+        <button class="dropdown-trigger" id="dropdownTrigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="productLabel dropdownValue">
+          <span id="dropdownValue"></span>
+        </button>
+        <ul class="dropdown-menu" id="optionList" role="listbox" aria-labelledby="productLabel"></ul>
+      </div>
+
+      <div class="decision-message" id="decisionMessage" role="alert" aria-live="assertive"></div>
+
+      <div class="button-row">
+        <button class="action-button" type="button" data-action="add_to_cart">Add to cart</button>
+        <button class="action-button" type="button" data-action="leave">Leave</button>
+      </div>
+
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const products = [
+        { name: 'Halden', image: './product-images/Halden.png' },
+        { name: 'Kellan', image: './product-images/Kellan.png' },
+        { name: 'Norwyn', image: './product-images/Norwyn.png' },
+        { name: 'Marlow', image: './product-images/Marlow.png' },
+        { name: 'Rowen', image: './product-images/Rowen.png' },
+        { name: 'Vanton', image: './product-images/Vanton.png' },
+        { name: 'Arden', image: './product-images/Arden.png' },
+        { name: 'Bellmore', image: './product-images/Bellmore.png' },
+        { name: 'Calder', image: './product-images/Calder.png' }
+      ];
+
+      const minimumViewTimeMs = 10000;
+      const pageShownAt = Date.now();
+      const randomizedProducts = shuffle(products);
+      const productDisplayOrder = randomizedProducts.map(product => product.name);
+      const clickCounts = Object.fromEntries(products.map(product => [product.name, 0]));
+      const hoverCounts = Object.fromEntries(products.map(product => [product.name, 0]));
+      let hasOpenedDropdown = false;
+      let dropdownOpenCount = 0;
+      let selectedProduct = null;
+      let submitted = false;
+
+      const productDropdown = document.getElementById('productDropdown');
+      const dropdownTrigger = document.getElementById('dropdownTrigger');
+      const dropdownValue = document.getElementById('dropdownValue');
+      const optionList = document.getElementById('optionList');
+      const productImage = document.getElementById('productImage');
+      const decisionMessage = document.getElementById('decisionMessage');
+
+      dropdownTrigger.addEventListener('click', () => {
+        if (submitted) return;
+        const willOpen = !productDropdown.classList.contains('is-open');
+        productDropdown.classList.toggle('is-open', willOpen);
+        dropdownTrigger.setAttribute('aria-expanded', String(willOpen));
+
+        if (willOpen) {
+          hasOpenedDropdown = true;
+          dropdownOpenCount += 1;
+          hideWarning();
+        }
+      });
+
+      randomizedProducts.forEach((product, index) => {
+        const item = document.createElement('li');
+        const option = document.createElement('button');
+        option.type = 'button';
+        option.className = 'product-option';
+        option.textContent = product.name;
+        option.dataset.name = product.name;
+        option.dataset.position = String(index + 1);
+        option.setAttribute('role', 'option');
+        option.setAttribute('aria-selected', 'false');
+
+        option.addEventListener('mouseenter', () => {
+          if (submitted) return;
+          hoverCounts[product.name] += 1;
+          displayProduct(product);
+          hideWarning();
+        });
+
+        option.addEventListener('focus', () => {
+          if (!submitted) displayProduct(product);
+        });
+
+        option.addEventListener('click', () => {
+          if (submitted) return;
+          clickCounts[product.name] += 1;
+          selectedProduct = product;
+          displayProduct(product);
+          hideWarning();
+          dropdownValue.textContent = product.name;
+          dropdownTrigger.classList.add('is-selected');
+          productDropdown.classList.remove('is-open');
+          dropdownTrigger.setAttribute('aria-expanded', 'false');
+
+          document.querySelectorAll('.product-option').forEach(button => {
+            const isSelected = button.dataset.name === product.name;
+            button.classList.toggle('is-selected', isSelected);
+            button.setAttribute('aria-selected', String(isSelected));
+          });
+        });
+
+        item.appendChild(option);
+        optionList.appendChild(item);
+      });
+
+      document.addEventListener('click', event => {
+        if (productDropdown.contains(event.target)) return;
+        productDropdown.classList.remove('is-open');
+        dropdownTrigger.setAttribute('aria-expanded', 'false');
+      });
+
+      document.querySelector('.button-row').addEventListener('click', event => {
+        const button = event.target.closest('.action-button');
+        if (!button || submitted) return;
+        const action = button.dataset.action;
+
+        if (!hasOpenedDropdown) {
+          showWarning('Please review the available products before continuing.');
+          return;
+        }
+
+        if (action === 'add_to_cart' && !selectedProduct) {
+          showWarning('Please click a product before adding it to your cart.');
+          return;
+        }
+
+        if (action === 'leave' && Date.now() - pageShownAt < minimumViewTimeMs) {
+          showWarning('Please review the available products for at least 10 seconds before leaving.');
+          return;
+        }
+
+        complete(action);
+      });
+
+      function displayProduct(product) {
+        productImage.src = product.image;
+        productImage.alt = `${product.name} wireless over-ear headphones`;
+        productImage.classList.add('is-visible');
+      }
+
+      function showWarning(message) {
+        decisionMessage.textContent = message;
+        decisionMessage.classList.add('is-visible');
+      }
+
+      function hideWarning() {
+        decisionMessage.textContent = '';
+        decisionMessage.classList.remove('is-visible');
+      }
+
+      function complete(action) {
+        const interactionDetails = productDisplayOrder.map((name, index) => ({
+          product: name,
+          position: index + 1,
+          hoverCount: hoverCounts[name],
+          clickCount: clickCounts[name]
+        }));
+
+        const message = {
+          type: 'netlify_complete',
+          action,
+          page: window.location.pathname,
+          pageDurationMs: String(Date.now() - pageShownAt),
+          pageCompleteTime: new Date().toISOString(),
+          productOrder: productDisplayOrder.join(' | '),
+          selectedProduct: selectedProduct ? selectedProduct.name : '',
+          selectedProductPosition: selectedProduct
+            ? String(productDisplayOrder.indexOf(selectedProduct.name) + 1)
+            : '',
+          dropdownOpenCount: String(dropdownOpenCount),
+          interactionDetails
+        };
+
+        productDisplayOrder.forEach((name, index) => {
+          message[`productOrder${index + 1}`] = name;
+          message[`clickCount_${name}`] = String(clickCounts[name]);
+          message[`hoverCount_${name}`] = String(hoverCounts[name]);
+        });
+
+        submitted = true;
+        window.productChoiceResult = message;
+        window.parent.postMessage(message, '*');
+        if (window.top && window.top !== window.parent) {
+          window.top.postMessage(message, '*');
+        }
+      }
+
+      function shuffle(items) {
+        const result = [...items];
+        for (let index = result.length - 1; index > 0; index -= 1) {
+          const randomIndex = Math.floor(Math.random() * (index + 1));
+          [result[index], result[randomIndex]] = [result[randomIndex], result[index]];
+        }
+        return result;
+      }
+    })();
+  </script>
+</body>
+</html>
