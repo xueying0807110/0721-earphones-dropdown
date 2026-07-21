@@ -366,6 +366,27 @@
       const optionList = document.getElementById('optionList');
       const productImage = document.getElementById('productImage');
       const decisionMessage = document.getElementById('decisionMessage');
+      const imageCache = new Map();
+      let imageRequestId = 0;
+
+      products.forEach(product => {
+        const image = new Image();
+        image.decoding = 'async';
+        image.src = product.image;
+        imageCache.set(product.name, image);
+      });
+
+      const postPageHeight = () => {
+        window.parent.postMessage({
+          type: 'product_page_resize',
+          height: Math.ceil(document.documentElement.scrollHeight)
+        }, '*');
+      };
+
+      window.addEventListener('load', postPageHeight);
+      if ('ResizeObserver' in window) {
+        new ResizeObserver(postPageHeight).observe(document.body);
+      }
 
       dropdownTrigger.addEventListener('click', () => {
         if (submitted) return;
@@ -454,9 +475,21 @@
       });
 
       function displayProduct(product) {
-        productImage.src = product.image;
-        productImage.alt = `${product.name} wireless over-ear headphones`;
-        productImage.classList.add('is-visible');
+        const requestId = ++imageRequestId;
+        const cachedImage = imageCache.get(product.name);
+        const revealImage = () => {
+          if (requestId !== imageRequestId) return;
+          productImage.src = product.image;
+          productImage.alt = `${product.name} wireless over-ear headphones`;
+          productImage.classList.add('is-visible');
+        };
+
+        if (cachedImage && cachedImage.complete && cachedImage.naturalWidth > 0) {
+          revealImage();
+        } else if (cachedImage) {
+          productImage.classList.remove('is-visible');
+          cachedImage.addEventListener('load', revealImage, { once: true });
+        }
       }
 
       function showWarning(message) {
